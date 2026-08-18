@@ -7,7 +7,8 @@
 -- 1. REGIONS TABLE
 -- -----------------------------------------------------
 
-CREATE TABLE REGIONS (
+
+CREATE TABLE IF NOT EXISTS REGIONS (
     region_id      VARCHAR(10),
     region_name    VARCHAR(100),
     country        VARCHAR(100),
