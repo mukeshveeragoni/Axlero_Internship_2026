@@ -8,14 +8,15 @@
 -- 1. REGIONS
 -- ============================================================
 
+
 INSERT INTO REGIONS
-(region_id, region_name, country, continent)
+    (region_id, region_name, country, continent)
 VALUES
-('R01', 'South',   'India', 'Asia'),
-('R02', 'North',   'India', 'Asia'),
-('R03', 'East',    'India', 'Asia'),
-('R04', 'West',    'India', 'Asia'),
-('R05', 'Central', 'India', 'Asia');
+    ('R01', 'South',   'India', 'Asia'),
+    ('R02', 'North',   'India', 'Asia'),
+    ('R03', 'East',    'India', 'Asia'),
+    ('R04', 'West',    'India', 'Asia'),
+    ('R05', 'Central', 'India', 'Asia');
 
 -- ============================================================
 -- 2. CUSTOMERS
