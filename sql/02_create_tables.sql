@@ -1,14 +1,16 @@
--- =====================================================
+-- ============================================================
 -- MetricMind
--- Corporate Data Warehouse - Raw Table Definitions
--- =====================================================
+-- Corporate Data Warehouse
+-- 02 - Create RAW Tables
+-- Snowflake Version
+-- ============================================================
 
--- -----------------------------------------------------
+
+-- ============================================================
 -- 1. REGIONS TABLE
--- -----------------------------------------------------
+-- ============================================================
 
-
-CREATE TABLE IF NOT EXISTS REGIONS (
+CREATE TABLE IF NOT EXISTS RAW.REGIONS (
     region_id      VARCHAR(10),
     region_name    VARCHAR(100),
     country        VARCHAR(100),
@@ -16,11 +18,11 @@ CREATE TABLE IF NOT EXISTS REGIONS (
 );
 
 
--- -----------------------------------------------------
+-- ============================================================
 -- 2. CUSTOMERS TABLE
--- -----------------------------------------------------
+-- ============================================================
 
-CREATE TABLE CUSTOMERS (
+CREATE TABLE IF NOT EXISTS RAW.CUSTOMERS (
     customer_id      VARCHAR(10),
     customer_name    VARCHAR(200),
     customer_type    VARCHAR(50),
@@ -30,11 +32,11 @@ CREATE TABLE CUSTOMERS (
 );
 
 
--- -----------------------------------------------------
+-- ============================================================
 -- 3. PRODUCTS TABLE
--- -----------------------------------------------------
+-- ============================================================
 
-CREATE TABLE PRODUCTS (
+CREATE TABLE IF NOT EXISTS RAW.PRODUCTS (
     product_id       VARCHAR(10),
     product_name     VARCHAR(200),
     category         VARCHAR(100),
@@ -44,11 +46,11 @@ CREATE TABLE PRODUCTS (
 );
 
 
--- -----------------------------------------------------
+-- ============================================================
 -- 4. ORDERS TABLE
--- -----------------------------------------------------
+-- ============================================================
 
-CREATE TABLE ORDERS (
+CREATE TABLE IF NOT EXISTS RAW.ORDERS (
     order_id         VARCHAR(15),
     order_date       DATE,
     customer_id      VARCHAR(10),
@@ -59,12 +61,11 @@ CREATE TABLE ORDERS (
 );
 
 
--- -----------------------------------------------------
+-- ============================================================
 -- 5. SALES TABLE
--- -----------------------------------------------------
+-- ============================================================
 
-
-CREATE TABLE SALES (
+CREATE TABLE IF NOT EXISTS RAW.SALES (
     sale_id          VARCHAR(15),
     order_id         VARCHAR(15),
     sale_date        DATE,
@@ -73,11 +74,11 @@ CREATE TABLE SALES (
 );
 
 
--- -----------------------------------------------------
+-- ============================================================
 -- 6. COSTS TABLE
--- -----------------------------------------------------
+-- ============================================================
 
-CREATE TABLE COSTS (
+CREATE TABLE IF NOT EXISTS RAW.COSTS (
     cost_id          VARCHAR(20),
     order_id         VARCHAR(15),
     cost_type        VARCHAR(50),
