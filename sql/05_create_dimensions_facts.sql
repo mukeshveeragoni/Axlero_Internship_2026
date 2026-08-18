@@ -1,130 +1,112 @@
--- ============================================================
+-- =====================================================
 -- MetricMind
--- Corporate Data Warehouse
--- 05 - Create Dimensions and Fact Tables
--- Snowflake Version
--- ============================================================
+-- Dimension and Fact Tables
+-- SQLite
+-- =====================================================
 
 
--- ============================================================
--- 1. DIMENSION - DATE
--- ============================================================
+-- =====================================================
+-- 1. CUSTOMER DIMENSION
+-- =====================================================
 
-CREATE OR REPLACE TABLE WAREHOUSE.DIM_DATE AS
-SELECT DISTINCT
-    TO_NUMBER(TO_CHAR(sale_date, 'YYYYMMDD')) AS date_key,
-    sale_date AS full_date,
-    YEAR(sale_date) AS year,
-    MONTH(sale_date) AS month,
-    MONTHNAME(sale_date) AS month_name,
-    QUARTER(sale_date) AS quarter,
-    DAY(sale_date) AS day
-FROM STAGING.STG_FINAL_SALES
-WHERE sale_date IS NOT NULL;
+DROP TABLE IF EXISTS DIM_CUSTOMER;
 
-
--- ============================================================
--- 2. DIMENSION - REGION
--- ============================================================
-
-CREATE OR REPLACE TABLE WAREHOUSE.DIM_REGION AS
+CREATE TABLE DIM_CUSTOMER AS
 SELECT
-    ROW_NUMBER() OVER (ORDER BY region_id) AS region_key,
-    region_id,
-    region_name,
-    country,
-    continent
-FROM STAGING.STG_REGIONS;
-
-
--- ============================================================
--- 3. DIMENSION - CUSTOMER
--- ============================================================
-
-CREATE OR REPLACE TABLE WAREHOUSE.DIM_CUSTOMER AS
-SELECT
-    ROW_NUMBER() OVER (ORDER BY customer_id) AS customer_key,
     customer_id,
     customer_name,
     customer_type,
     region_id,
     country,
     signup_date
-FROM STAGING.STG_CUSTOMERS;
+FROM CLEAN_CUSTOMERS;
 
 
--- ============================================================
--- 4. DIMENSION - PRODUCT
--- ============================================================
+-- =====================================================
+-- 2. PRODUCT DIMENSION
+-- =====================================================
 
-CREATE OR REPLACE TABLE WAREHOUSE.DIM_PRODUCT AS
+DROP TABLE IF EXISTS DIM_PRODUCT;
+
+CREATE TABLE DIM_PRODUCT AS
 SELECT
-    ROW_NUMBER() OVER (ORDER BY product_id) AS product_key,
     product_id,
     product_name,
     category,
     sub_category,
     unit_cost,
     unit_price
-FROM STAGING.STG_PRODUCTS;
+FROM CLEAN_PRODUCTS;
 
 
--- ============================================================
--- 5. FACT - SALES
--- ============================================================
+-- =====================================================
+-- 3. REGION DIMENSION
+-- =====================================================
 
-CREATE OR REPLACE TABLE WAREHOUSE.FACT_SALES AS
+DROP TABLE IF EXISTS DIM_REGION;
+
+CREATE TABLE DIM_REGION AS
 SELECT
-    s.order_id,
+    region_id,
+    region_name,
+    country,
+    continent
+FROM CLEAN_REGIONS;
+
+
+-- =====================================================
+-- 4. SALES FACT
+-- =====================================================
+
+DROP TABLE IF EXISTS FACT_SALES;
+
+CREATE TABLE FACT_SALES AS
+SELECT
     s.sale_id,
+    s.order_id,
+    o.order_date,
+    s.sale_date,
 
-    d.date_key,
+    o.customer_id,
+    o.product_id,
+    o.region_id,
 
-    c.customer_key,
-    p.product_key,
-    r.region_key,
+    o.quantity,
+    o.unit_price,
 
-    s.quantity,
-    s.unit_price,
-    s.order_value,
     s.revenue,
-    s.total_cost,
-    s.gross_profit,
-    s.profit_margin_pct,
+
+    ROUND(
+        o.quantity * p.unit_cost,
+        2
+    ) AS total_cost,
+
+    ROUND(
+        s.revenue - (o.quantity * p.unit_cost),
+        2
+    ) AS gross_profit,
+
     s.sales_channel
 
-FROM STAGING.STG_FINAL_SALES s
+FROM CLEAN_SALES s
 
-LEFT JOIN WAREHOUSE.DIM_DATE d
-    ON s.sale_date = d.full_date
+JOIN CLEAN_ORDERS o
+    ON s.order_id = o.order_id
 
-LEFT JOIN WAREHOUSE.DIM_CUSTOMER c
-    ON s.customer_id = c.customer_id
-
-LEFT JOIN WAREHOUSE.DIM_PRODUCT p
-    ON s.product_id = p.product_id
-
-LEFT JOIN WAREHOUSE.DIM_REGION r
-    ON s.region_id = r.region_id;
+JOIN CLEAN_PRODUCTS p
+    ON o.product_id = p.product_id;
 
 
--- ============================================================
--- 6. CHECK DIMENSIONS
--- ============================================================
+-- =====================================================
+-- 5. COST FACT
+-- =====================================================
 
-SELECT * FROM WAREHOUSE.DIM_DATE;
+DROP TABLE IF EXISTS FACT_COST;
 
-SELECT * FROM WAREHOUSE.DIM_REGION;
-
-SELECT * FROM WAREHOUSE.DIM_CUSTOMER;
-
-SELECT * FROM WAREHOUSE.DIM_PRODUCT;
-
-
--- ============================================================
--- 7. CHECK FACT TABLE
--- ============================================================
-
-SELECT *
-FROM WAREHOUSE.FACT_SALES
-ORDER BY date_key, order_id;
+CREATE TABLE FACT_COST AS
+SELECT
+    cost_id,
+    order_id,
+    cost_type,
+    cost_amount
+FROM CLEAN_COSTS;
