@@ -7,10 +7,16 @@ load_dotenv()
 CUBE_API_URL = os.getenv("CUBE_API_URL")
 CUBE_API_TOKEN = os.getenv("CUBE_API_TOKEN")
 
+
 def get_cube_schema():
     """
     Get the semantic layer schema from Cube.dev.
     """
+    if not CUBE_API_URL:
+        raise ValueError("CUBE_API_URL is not configured")
+
+    if not CUBE_API_TOKEN:
+        raise ValueError("CUBE_API_TOKEN is not configured")
 
     meta_url = CUBE_API_URL.replace(
         "/cubejs-api/v1/load",
@@ -19,25 +25,24 @@ def get_cube_schema():
 
     headers = {
         "Authorization": f"Bearer {CUBE_API_TOKEN}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
 
     response = requests.get(
         meta_url,
         headers=headers,
-        timeout=30
+        timeout=30,
     )
 
     response.raise_for_status()
 
     return response.json()
 
+
 def format_cube_schema(metadata):
     """
-    Convert Cube metadata into a simple structure
-    for the AI agent.
+    Convert Cube metadata into a simple structure for the AI agent.
     """
-    
     schema = {}
 
     for cube in metadata.get("cubes", []):
@@ -56,7 +61,7 @@ def format_cube_schema(metadata):
                 dimension["name"]
                 for dimension in cube.get("dimensions", [])
                 if dimension.get("name")
-            ]
+            ],
         }
 
     return schema

@@ -7,56 +7,33 @@ load_dotenv()
 CUBE_API_URL = os.getenv("CUBE_API_URL")
 CUBE_API_TOKEN = os.getenv("CUBE_API_TOKEN")
 
-def get_cube_schema():
+
+def query_cube(query: dict):
     """
-    Get the semantic layer schema from Cube.dev.
+    Execute a query against the Cube.dev Semantic Layer.
+
+    The query must use Cube measures, dimensions, and filters.
+    Raw SQL is not accepted.
     """
 
-    meta_url = CUBE_API_URL.replace(
-        "/cubejs-api/v1/load",
-        "/cubejs-api/v1/meta"
-    )
+    if not CUBE_API_URL:
+        raise ValueError("CUBE_API_URL is not configured")
+
+    if not CUBE_API_TOKEN:
+        raise ValueError("CUBE_API_TOKEN is not configured")
 
     headers = {
         "Authorization": f"Bearer {CUBE_API_TOKEN}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
 
-    response = requests.get(
-        meta_url,
+    response = requests.post(
+        CUBE_API_URL,
         headers=headers,
-        timeout=30
+        json=query,
+        timeout=60,
     )
 
     response.raise_for_status()
 
     return response.json()
-
-def format_cube_schema(metadata):
-    """
-    Convert Cube metadata into a simple structure
-    for the AI agent.
-    """
-
-    schema = {}
-
-    for cube in metadata.get("cubes", []):
-        cube_name = cube.get("name")
-
-        if not cube_name:
-            continue
-
-        schema[cube_name] = {
-            "measures": [
-                measure["name"]
-                for measure in cube.get("measures", [])
-                if measure.get("name")
-            ],
-            "dimensions": [
-                dimension["name"]
-                for dimension in cube.get("dimensions", [])
-                if dimension.get("name")
-            ]
-        }
-
-    return schema
