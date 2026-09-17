@@ -56,7 +56,7 @@ export default function Home() {
 
     if (q.includes("european") && q.includes("margin")) {
       setResponse(
-        "European margin decreased as the monthly margin values declined."
+        "European margin decreased because operating costs increased while sales growth slowed."
       );
 
       setChartTitle("European Margin Trend");
@@ -76,7 +76,6 @@ export default function Home() {
     setResponse(
       "I could not identify a visualization type for this question yet."
     );
-
     setChartData([]);
     setChartTitle("");
   };
@@ -102,7 +101,7 @@ export default function Home() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Ask your business question..."
-            className="mt-3 w-full rounded-lg border border-gray-300 p-3"
+            className="mt-3 w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-blue-500"
           />
 
           <p className="mt-3 text-sm text-gray-500">
@@ -117,7 +116,7 @@ export default function Home() {
 
           <button
             onClick={askQuestion}
-            className="mt-4 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white"
+            className="mt-4 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           >
             Ask
           </button>
